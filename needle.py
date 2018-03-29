@@ -13,11 +13,18 @@ class Point:
         self.paths = paths
 
     def __repr__(self):
-        return str(self.score)
-        # return str(self.paths[0])
+        #return str(self.score)
+        return str(self.paths[0])
+        """
+        try:
+            return str(self.paths[1])
+        except IndexError:
+            return str(self.paths[0])
+        """
 
 
-def calculate_paths_linear(str1, str2, match, mismatch, gap, i, j, v_matrix):
+
+def calculate_paths(str1, str2, match, mismatch, gap, i, j, v_matrix):
     if str1[j-1] == str2[i-1]:
         diagonal_score = v_matrix[i-1][j-1].score + match
     else:
@@ -57,16 +64,40 @@ def traceback_static(str1, str2, m, n, v_matrix):
             res2 += '-'
             n -= 1
 
-    return res1[::-1], res2[::-1] # reverse the strings
+    return res1[::-1], res2[::-1] # reverse and return the strings
 
 
-def traceback_multiple():
-    res1 = ''
-    res2 = ''
-    while(m!=0 or n!=0): # iterate until we are at root
-        for path in v_matrix[m][n].paths: # iterate over each path to this point
-            pass
-    return res1[::-1], res2[::-1]
+def traceback_multiple(str1, str2, m, n, v_matrix):
+    result1 = []
+    result2 = []
+    for path in v_matrix[m][n].paths: # iterate over each path to this point
+        prefix1 = ''
+        prefix2 = ''
+        suffix1 = []
+        suffix2 = []
+        if path == DIAGONAL:
+            prefix1 += str1[n-1]
+            prefix2 += str2[m-1]
+            suffix1, suffix2 = traceback_multiple(str1, str2, m-1, n-1, v_matrix)
+        elif path == VERTICAL:
+            prefix1 += '-'
+            prefix2 += str2[m-1]
+            suffix1, suffix2 = traceback_multiple(str1, str2, m-1, n, v_matrix)
+        elif path == HORIZONTAL:
+            prefix1 += str1[n-1]
+            prefix2 += '-'
+            suffix1, suffix2 = traceback_multiple(str1, str2, m, n-1, v_matrix)
+        elif path == ORIGIN:
+            prefix1 = ''
+            prefix2 = ''
+            result1.append(prefix1)
+            result2.append(prefix2)
+
+        for suffix in suffix1:
+            result1.append(prefix1+suffix)
+        for suffix in suffix2:
+            result2.append(prefix2+suffix)
+    return result1, result2
 
 # gap = -2, mismatch = -1, match = 1
 #     _ | a | b | c | g | e
@@ -100,14 +131,16 @@ def needleman_wunsch_linear(str1, str2,
 
     for i in range(1,m):
         for j in range(1,n):
-            score, paths = calculate_paths_linear(str1, str2, 
-                             match, mismatch, gap, i, j, v_matrix)
+            score, paths = calculate_paths(str1, str2, match, mismatch, gap,
+                                            i, j, v_matrix)
             v_matrix[i][j] = Point(score, paths)
 
-    res1, res2 = traceback_static(str1, str2, m-1, n-1, v_matrix)
+    res1, res2 = traceback_multiple(str1, str2, m-1, n-1, v_matrix)
     print(res1)
     print(res2)
     pp = pprint.PrettyPrinter(width=len(str1), compact=True)
     pp.pprint(np.matrix(v_matrix))
 
-needleman_wunsch_linear('abcde','abcdef',1,-1,-2)
+# needleman_wunsch_linear('abcde','abcdef',1,-1,-2)
+needleman_wunsch_linear('ATTGACCTGA','ATCCTGA',1,-1,-2)
+
