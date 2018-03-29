@@ -18,7 +18,9 @@ Make sure you install all dependencies with:
 ----
 ## Features
 Global alignment calculated offline using Needleman-Wunsch, can calculate multiple paths using linear or affine gap penalties.
+
 Local aligment calculated via the BLAST restful API hosted by NCBI.
 
 ----
 ## Thanks
+Rui Balau & Simon Afonso
