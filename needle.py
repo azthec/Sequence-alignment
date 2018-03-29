@@ -1,7 +1,7 @@
 import numpy as np
 import pprint
 
-DEBUG = 0
+DEBUG = 1
 
 ORIGIN = -1
 DIAGONAL = 0
