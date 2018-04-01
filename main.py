@@ -43,7 +43,7 @@ try:
         gap_choice = easygui.choicebox(msg, title, gap_choices)
 
 
-        msg = "Enter Needleman-Wunsch with linear gap parameters, customarily match is a positive integer and mismatch and gap penalties are negative integers."
+        msg = "Enter Needleman-Wunsch with appropriate gap parameters, customarily match is a positive integer and mismatch and gap penalties are negative integers.\n\n Do not enter fasta sequence headers."
         if gap_choice == gap_choices[0]:
             fieldNames = ["Sequence 1", "Sequence 2", "Match bonus", "Mismatch penalty", "Gap penalty"]
         elif gap_choice == gap_choices[1]:
@@ -67,14 +67,19 @@ try:
             if errmsg == "": break # no problems found
             fieldValues = easygui.multenterbox(errmsg, title, fieldNames, fieldValues)
         
-        print("Reply was: {}".format(fieldValues))
+        
         if fieldValues == None:
             print("User canceled the operation.")
             exit(1)
 
+        # print("Reply was: {}".format(fieldValues))
         if gap_choice == gap_choices[0]:
+            fieldValues[0] = ''.join(e for e in fieldValues[0] if e.isalnum())
+            fieldValues[1] = ''.join(e for e in fieldValues[1] if e.isalnum())
             result1, result2 = needle.needleman_wunsch_linear(fieldValues[0], fieldValues[1], traceback, int(fieldValues[2]), int(fieldValues[3]), int(fieldValues[4]))
         elif gap_choice == gap_choices[1]:
+            fieldValues[0] = ''.join(e for e in fieldValues[0] if e.isalnum())
+            fieldValues[1] = ''.join(e for e in fieldValues[1] if e.isalnum())
             result1, result2 = needle.needleman_wunsch_affine(fieldValues[0], fieldValues[1], traceback, int(fieldValues[2]), int(fieldValues[3]), int(fieldValues[4]), int(fieldValues[5]))
         else:
             print("User canceled the operation.")
