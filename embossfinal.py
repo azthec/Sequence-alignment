@@ -26,14 +26,6 @@ version = "$Id: emboss_needle_urllib2.py 2809 2017-02-10 16:10:25Z afoix $"
 parser = OptionParser(usage=usage, description=description, epilog=epilog, version=version)
 # Tool specific options
 parser.add_option('--stype', help='Sequence type: DNA or protein')
-parser.add_option('--matrix', help='Scoring matrix')
-parser.add_option('--gapopen', help='Gap creation penalty')
-parser.add_option('--gapext', help='Gap extension penalty')
-parser.add_option('--endopen', help='End gap creation penalty')
-parser.add_option('--endextend', help='End gap extension penalty')
-parser.add_option('--format', help='Alignment format')
-parser.add_option('--endweight', help='Enable end gap scoring')
-parser.add_option('--noendweight', help='Disable end gap scoring')
 parser.add_option('--asequence', help='First input sequence')
 parser.add_option('--bsequence', help='Second input sequence')
 # General options
@@ -301,61 +293,23 @@ def readFile(filename):
     printDebugMessage('readFile', 'End', 1)
     return data
 
-def alignmentfunc(sequence1, sequence2, type):
+def alignmentfunc(sequence1, sequence2, tipo, email1, title1):
     # No options... print help.
-    if numOpts < 2:
-        parser.print_help()
-    # List parameters
-    elif options.params:
-        printGetParameters()
-    # Get parameter details
-    elif options.paramDetail:
-        printGetParameterDetails(options.paramDetail)
-    # Submit job
-    elif options.email and not options.jobid:
-        params = {}
+    params = {}
     
-        params['asequence'] = sequence1
-        params['bsequence'] = sequence2
-        # Booleans need to be represented as 1/0 rather than True/False
-        # Add the other options (if defined)
-        params['stype'] = type
-        
-        if options.endweight:
-            params['noendweight'] = '0'
-        elif options.noendweight:
-            params['noendweight'] = '1'
-        elif options.matrix:
-            params['matrix'] = options.matrix
-        elif options.gapopen:
-            params['gapopen'] = options.gapopen
-        elif options.gapext:
-            params['gapext'] = options.gapext
-        elif options.endopen:
-            params['endopen'] = options.gapopen
-        elif options.endextend:
-            params['endextend'] = options.gapext
-        elif options.format:
-            params['format'] = options.format
-        # Submit the job
-        jobid = serviceRun(options.email, options.title, params)
-        if options.async: # Async mode
-            print jobid
-        else: # Sync mode
-            print >>sys.stderr, jobid
-            time.sleep(5)
-            getResult(jobid)
-    # Get job status
-    elif options.status and options.jobid:
-        printGetStatus(options.jobid)
-    # List result types for job
-    elif options.resultTypes and options.jobid:
-        printGetResultTypes(options.jobid)
-    # Get results for job
-    elif options.polljob and options.jobid:
-        getResult(options.jobid)
-    else:
-        print >>sys.stderr, 'Error: unrecognised argument combination'
-    parser.print_help()
+    params['asequence'] = sequence1
+    params['bsequence'] = sequence2
+    # Booleans need to be represented as 1/0 rather than True/False
+    # Add the other options (if defined)
+    params['stype'] = tipo
+    # Submit the job
+    jobid = serviceRun(email1, title1, params)
+    if options.async: # Async mode
+        print jobid
+    else: # Sync mode
+        print >>sys.stderr, jobid
+        time.sleep(5)
+        getResult(jobid)
 
-alignmentfunc("ATTGACCTGA","ATCCTGA","protein")
+
+alignmentfunc("ATTGACCTGA","ATCCTGA","protein","s94afonso@gmail.com","FCUP Bio")
