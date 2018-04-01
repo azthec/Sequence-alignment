@@ -1,4 +1,4 @@
-#python emboss2.py --email s94afonso@gmail.com --title FCUPBIO
+needle("ATTGACCTGA","ATCCTGA","protein","s94afonso@gmail.com","FCUP Bio")
 
 
 
