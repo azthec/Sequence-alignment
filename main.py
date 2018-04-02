@@ -24,9 +24,9 @@ if __name__ == "__main__":
 
         This program allows you to align two strings, that may represent proteins, genes, or even just two strings you want to calculate the indel distance of.
 
-        The program allows for global alignment calculated offline using Needleman-Wunsch, it also allows for local aligment calculated via the BLAST restful API hosted by NCBI.
+        Global alignment calculated offline using Needleman-Wunsch.
 
-        The offline global aligment can calculate only one or all paths and use a linear or affine gap penalty.
+        Various aligment types calculated via the EMBOSS restful API hosted by EBI.
 
         Rui Balau & Simon Afonso - March 2018
 
@@ -48,7 +48,7 @@ if __name__ == "__main__":
                 print("User canceled the operation.")
                 exit(1)
 
-            msg = "Enter Needleman-Wunsch with appropriate gap parameters, customarily match is a positive integer and mismatch and gap penalties are negative integers.\n\n Do not enter fasta sequence headers."
+            msg = "Choose the gap penalty type to use."
             gap_choices = ["Linear", "Affine"]
             gap_choice = easygui.choicebox(msg, title, gap_choices)
 
@@ -59,6 +59,10 @@ if __name__ == "__main__":
             else:
                 print("User canceled the operation.")
                 exit(1)
+
+
+            msg = "Enter arguments for Needleman-Wunsch with appropriate gap parameters. Customarily match is a positive integer and mismatch and gap penalties are negative integers.\n\n Do not enter fasta sequence headers."
+            
             fieldValues = []  # we start with blanks for the values
             fieldValues = easygui.multenterbox(msg,title, fieldNames)
 
@@ -140,6 +144,7 @@ if __name__ == "__main__":
                     errmsg = errmsg + ('"%s" is neither DNA or Protein sequence.\n\n' % fieldNames[0])
                 seqb_isDNA = all(i in valid_dna for i in fieldValues[1]) 
                 seqb_isAMIN = all(i in valid_protein for i in fieldValues[1])
+
                 if not (seqb_isDNA or seqb_isAMIN): # check if b is dna or amin
                     errmsg = errmsg + ('"%s" is neither DNA or Protein sequence.\n\n' % fieldNames[1])
                 if not seqa_isAMIN == seqb_isAMIN: # check if one is dna and another prot
