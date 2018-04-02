@@ -12,8 +12,8 @@ def isInt(s):
         return False
 
 
-def timebox():
-    easygui.msgbox('Awaiting reply.') 
+def timebox(msg):
+    easygui.msgbox(msg) 
 
 
 
@@ -80,7 +80,8 @@ if __name__ == "__main__":
                 print("User canceled the operation.")
                 exit(1)
 
-            # print("Reply was: {}".format(fieldValues))
+            process = multiprocessing.Process(target=timebox, args=('Running...',))
+            process.start()
             if gap_choice == gap_choices[0]:
                 fieldValues[0] = ''.join(e for e in fieldValues[0] if e.isalnum())
                 fieldValues[1] = ''.join(e for e in fieldValues[1] if e.isalnum())
@@ -90,8 +91,11 @@ if __name__ == "__main__":
                 fieldValues[1] = ''.join(e for e in fieldValues[1] if e.isalnum())
                 result1, result2 = offline_needleman.needleman_wunsch_affine(fieldValues[0], fieldValues[1], traceback, int(fieldValues[2]), int(fieldValues[3]), int(fieldValues[4]), int(fieldValues[5]))
             else:
+                process.terminate()
                 print("User canceled the operation.")
                 exit(1)
+
+            process.terminate()
 
             text = ''
             n_results = len(result1)
@@ -153,7 +157,7 @@ if __name__ == "__main__":
             else:
                 seq_type = 'dna'
 
-            process = multiprocessing.Process(target=timebox, args=())
+            process = multiprocessing.Process(target=timebox, args=('Awaiting reply.',))
             process.start()
 
             if choice == choices[0]:
