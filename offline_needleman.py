@@ -11,17 +11,38 @@ HORIZONTAL = 2
 TRACEBACK_SINGLE_PATH = 95
 TRACEBACK_MULTI_PATH = 68
 
+
 class Point:
     def __init__(self, score, paths):
+        """
+        Initializes an instance of a Point object.
+
+        :param score: Integer score.
+        :param paths: List of possible paths.
+        """
         self.score = score
         self.paths = paths
 
     # repr for debugging prints
     def __repr__(self):
         return str(self.score)
-        #return str(self.paths[0])
+        # return str(self.paths[0])
+
 
 def calculate_paths_linear(str1, str2, match, mismatch, gap, i, j, v_matrix):
+    """
+    Calculates the best paths of edit distance using a linear gap penalty.
+
+    :param str1: Query string 2
+    :param str2: Query string 2
+    :param match: Match bonus
+    :param mismatch: Mismatch penalty
+    :param gap: Gap penalty
+    :param i: Point i index in matrix
+    :param j: Point j index in matrix
+    :param v_matrix: Point matrix
+    :return: Max possible score, list of max scoring paths
+    """
     if str1[j-1] == str2[i-1]:
         diagonal_score = v_matrix[i-1][j-1].score + match
     else:
@@ -39,10 +60,25 @@ def calculate_paths_linear(str1, str2, match, mismatch, gap, i, j, v_matrix):
         paths.append(HORIZONTAL)
     return max_score, paths
 
+
 # gap + gap_extension * gap_len
 # gap is known as the gap opening penalty
 # gap_extension the gap extension penalty
 def calculate_paths_affine(str1, str2, match, mismatch, gap, gap_extension, i, j, v_matrix):
+    """
+    Calculates the best paths of edit distance using a linear gap penalty.
+
+    :param str1: Query string 2
+    :param str2: Query string 2
+    :param match: Match bonus
+    :param mismatch: Mismatch penalty
+    :param gap: Gap penalty
+    :param gap_extension: Gap extension penalty
+    :param i: Point i index in matrix
+    :param j: Point j index in matrix
+    :param v_matrix: Point matrix
+    :return: Max possible score, list of max scoring paths
+    """
     if str1[j-1] == str2[i-1]:
         diagonal_score = v_matrix[i-1][j-1].score + match
     else:
@@ -70,11 +106,24 @@ def calculate_paths_affine(str1, str2, match, mismatch, gap, gap_extension, i, j
         paths.append(HORIZONTAL)
     return max_score, paths
 
+
 def traceback_static(str1, str2, m, n, v_matrix):
+    """
+    Iteratively backtraces through the calculated score matrix in order to determine one of the best possible paths and
+    returns it.
+
+    :param str1: Query string 1
+    :param str2: Query string 2
+    :param m: Size m of matrix
+    :param n: Size n of matrix
+    :param v_matrix: Point matrix
+    :return: Best possible alignment sequence 1, Best possible alignment sequence 2
+    """
+
     res1 = ''
     res2 = ''
-    while(m!=0 or n!=0): # iterate until we are at root
-        path = v_matrix[m][n].paths[0] # iterate over the first path in the point
+    while m != 0 or n != 0:  # iterate until we are at root
+        path = v_matrix[m][n].paths[0]  # iterate over the first path in the point
         if path == DIAGONAL:
             res1 += str1[n-1]
             res2 += str2[m-1]
@@ -88,10 +137,22 @@ def traceback_static(str1, str2, m, n, v_matrix):
             res1 += str1[n-1]
             res2 += '-'
             n -= 1
-    return res1[::-1], res2[::-1] # reverse and return the strings
+    return res1[::-1], res2[::-1]  # reverse and return the strings
 
 
 def traceback_multiple(str1, str2, m, n, v_matrix):
+    """
+    Recursively backtraces through the calculated score matrix and branches when needed in order to determine all of the
+    best possible paths and returns them.
+
+    :param str1: Query string 1
+    :param str2: Query string 2
+    :param m: Size m of matrix
+    :param n: Size n of matrix
+    :param v_matrix: Point matrix
+    :return: List of lists where each positional represents maximum scoring alignments
+    """
+
     result1 = []
     result2 = []
     for path in v_matrix[m][n].paths: # iterate over each path to this point
@@ -123,7 +184,20 @@ def traceback_multiple(str1, str2, m, n, v_matrix):
             result2.append(prefix2+suffix)
     return result1, result2
 
-def traceback(str1,str2, traceback_type, m, n, v_matrix):
+
+def traceback(str1, str2, traceback_type, m, n, v_matrix):
+    """
+    Backtraces through calculated score matrix and returns one or all possible alignment pairs, depending on
+    traceback_type supplied.
+
+    :param str1: Query string 1
+    :param str2: Query string 2
+    :param traceback_type: TRACEBACK_SINGLE_PATH or TRACEBACK_MULTI_PATH
+    :param m: Matrix m length
+    :param n: Matrix n Length
+    :param v_matrix: Point matrix
+    :return: List of lists where each positional represents maximum scoring alignments
+    """
     result1 = []
     result2 = []
     if traceback_type == TRACEBACK_SINGLE_PATH:
@@ -146,58 +220,80 @@ def traceback(str1,str2, traceback_type, m, n, v_matrix):
 
     return result1, result2
 
-def needleman_wunsch_linear(str1, str2, traceback_type,
-                             match, mismatch, gap):
-    n = len(str1) + 1 # +1 on each for empty string origin
+
+def needleman_wunsch_linear(str1, str2, traceback_type, match, mismatch, gap):
+    """
+    Run needleman wunsch using linear gap penalties.
+
+    :param str1: Query string 1
+    :param str2: Query string 2
+    :param traceback_type: TRACEBACK_SINGLE_PATH or TRACEBACK_MULTI_PATH
+    :param match: Match bonus
+    :param mismatch: Mismatch penalty
+    :param gap: Gap penalty
+    :return: List of lists where each positional represents maximum scoring alignments
+    """
+    n = len(str1) + 1  # +1 on each for empty string origin
     m = len(str2) + 1 
 
     # object allows us to store our custom points
     v_matrix = np.zeros((m, n), dtype=object)
 
     # initialize origin
-    v_matrix[0][0] = Point(0,[ORIGIN])
+    v_matrix[0][0] = Point(0, [ORIGIN])
     # initialize column 0
     for i in range(1, m):
-        v_matrix[i][0] = Point(gap*i,[VERTICAL])
+        v_matrix[i][0] = Point(gap*i, [VERTICAL])
     # initialize row 0
     for i in range(1, n):
-        v_matrix[0][i] = Point(gap*i,[HORIZONTAL])
+        v_matrix[0][i] = Point(gap*i, [HORIZONTAL])
 
-    for i in range(1,m):
-        for j in range(1,n):
+    for i in range(1, m):
+        for j in range(1, n):
             score, paths = calculate_paths_linear(str1, str2, match, mismatch, gap,
-                                            i, j, v_matrix)
+                                                  i, j, v_matrix)
             v_matrix[i][j] = Point(score, paths)
 
     # traceback and return
-    return traceback(str1,str2, traceback_type, m, n, v_matrix)
+    return traceback(str1, str2, traceback_type, m, n, v_matrix)
 
 
-def needleman_wunsch_affine(str1, str2, traceback_type, 
-                             match, mismatch, gap, gap_extension):
-    n = len(str1) + 1 # +1 on each for empty string origin
+def needleman_wunsch_affine(str1, str2, traceback_type, match, mismatch, gap, gap_extension):
+    """
+    Run needleman wunsch using linear gap penalties.
+
+    :param str1: Query string 1
+    :param str2: Query string 2
+    :param traceback_type: TRACEBACK_SINGLE_PATH or TRACEBACK_MULTI_PATH
+    :param match: Match bonus
+    :param mismatch: Mismatch penalty
+    :param gap: Gap penalty
+    :param gap_extension: Gap extension penalty
+    :return: List of lists where each positional represents maximum scoring alignments
+    """
+    n = len(str1) + 1  # +1 on each for empty string origin
     m = len(str2) + 1 
 
     # object allows us to store our custom points
     v_matrix = np.zeros((m, n), dtype=object)
 
     # initialize origin
-    v_matrix[0][0] = Point(0,[ORIGIN])
+    v_matrix[0][0] = Point(0, [ORIGIN])
     # initialize column 0
     for i in range(1, m):
-        v_matrix[i][0] = Point(gap + gap_extension*(i-1),[VERTICAL])
+        v_matrix[i][0] = Point(gap + gap_extension*(i-1), [VERTICAL])
     # initialize row 0
     for i in range(1, n):
-        v_matrix[0][i] = Point(gap + gap_extension*(i-1),[HORIZONTAL])
+        v_matrix[0][i] = Point(gap + gap_extension*(i-1), [HORIZONTAL])
 
-    for i in range(1,m):
-        for j in range(1,n):
+    for i in range(1, m):
+        for j in range(1, n):
             score, paths = calculate_paths_affine(str1, str2, match, mismatch, gap, gap_extension,
-                                            i, j, v_matrix)
+                                                  i, j, v_matrix)
             v_matrix[i][j] = Point(score, paths)
 
     # traceback and return
-    return traceback(str1,str2, traceback_type, m, n, v_matrix)
+    return traceback(str1, str2, traceback_type, m, n, v_matrix)
 
 # print(needleman_wunsch_linear('ATTGACCTGA', 'ATCCTGA', TRACEBACK_MULTI_PATH, 1, -1, -2))
 # print(needleman_wunsch_affine('ATTGACCTGA', 'ATCCTGA', TRACEBACK_SINGLE_PATH, 1, -1, -2, -1))
