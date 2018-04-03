@@ -4,7 +4,7 @@ from xmltramp2 import xmltramp
 from optparse import OptionParser
 
 baseUrl = 'placeholder global'
-email1 = 'noreply@fc.up.pt'
+email1 = 'up201103891@fc.up.pt'
 title1 = 'fcup bioinformatics'
 
 # Set interval for checking status

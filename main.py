@@ -5,6 +5,9 @@ import multiprocessing
 
 
 def isInt(s):
+    """
+
+    """
     try: 
         int(s)
         return True
@@ -84,8 +87,9 @@ if __name__ == "__main__":
                 print("User canceled the operation.")
                 exit(1)
 
-            process = multiprocessing.Process(target=timebox, args=('Running...',))
-            process.start()
+            # process = multiprocessing.Process(target=timebox, args=('Running...',))
+            # process.start()
+            
             if gap_choice == gap_choices[0]:
                 fieldValues[0] = ''.join(e for e in fieldValues[0] if e.isalnum())
                 fieldValues[1] = ''.join(e for e in fieldValues[1] if e.isalnum())
@@ -99,7 +103,7 @@ if __name__ == "__main__":
                 print("User canceled the operation.")
                 exit(1)
 
-            process.terminate()
+            # process.terminate()
 
             text = ''
             n_results = len(result1)
@@ -162,8 +166,8 @@ if __name__ == "__main__":
             else:
                 seq_type = 'dna'
 
-            process = multiprocessing.Process(target=timebox, args=('Awaiting reply.',))
-            process.start()
+            # process = multiprocessing.Process(target=timebox, args=('Awaiting reply.',))
+            # process.start()
 
             if choice == choices[0]:
                 text = emboss_align.emboss_smith_waterman(fieldValues[0], fieldValues[1], seq_type)
@@ -174,7 +178,8 @@ if __name__ == "__main__":
             else:
                 text = emboss_align.emboss_matcher(fieldValues[0], fieldValues[1], seq_type)
 
-            process.terminate()
+            # process.terminate()
+
             easygui.codebox("Aligned sequences: ", "Aligned Sequences" ,text)
 
         else:
